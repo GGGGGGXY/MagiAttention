@@ -1271,8 +1271,8 @@ struct CollectiveMainloopBwdSm90 {
               static_cast<uint32_t>(BwdNamedBarriers::dQFullWG1) + warp_group_idx /*id*/); // sdQ full, to be written to gmem
         } else {
           // We can reuse r2s_thr_copy_dQaccum for this partitioning
-          Tensor tdQrdQ_atomic = recast<float4>(r2s_thr_copy_dQaccum.retile_S(tdQrdQ));
-          Tensor tdQgdQaccum_atomic = recast<float4>(tdQgdQaccum(_, _, _, m_block));
+          Tensor tdQrdQ_atomic = r2s_thr_copy_dQaccum.retile_S(tdQrdQ);
+          Tensor tdQgdQaccum_atomic = tdQgdQaccum(_, _, _, _, _, m_block);
           static_assert(CUTE_STATIC_V(size(tdQrdQ_atomic)) == CUTE_STATIC_V(size(tdQgdQaccum_atomic)));
 #pragma unroll
           for (int i = 0; i < size(tdQrdQ_atomic); ++i) {
@@ -1295,8 +1295,8 @@ struct CollectiveMainloopBwdSm90 {
         flash::gemm</*zero_init=*/true, /*wg_wait=*/-1, /*SwapAB=*/dQ_swapAB, /*M_slice=*/0>(tiled_mma_dQ, tdQrdS_cur, tdQrK, tdQrdQ);
         flash::gemm</*zero_init=*/false, /*wg_wait=*/1, /*SwapAB=*/dKV_swapAB, /*M_slice=*/1>(
             tiled_mma_dKV, tdVrP_cur, tdVrdO(_, _, _, smem_pipe_read_do_cur.index()), tdVrdV);
-        Tensor tdQrdQ_atomic = recast<float4>(r2s_thr_copy_dQaccum.retile_S(tdQrdQ));
-        Tensor tdQgdQaccum_atomic = recast<float4>(tdQgdQaccum(_, _, _, m_block));
+        Tensor tdQrdQ_atomic = r2s_thr_copy_dQaccum.retile_S(tdQrdQ);
+        Tensor tdQgdQaccum_atomic = tdQgdQaccum(_, _, _, _, _, m_block);
 #pragma unroll
         for (int i = 0; i < size(tdQrdQ_atomic) / 2; ++i) {
           atomicAdd(&tdQgdQaccum_atomic(i), tdQrdQ_atomic(i));

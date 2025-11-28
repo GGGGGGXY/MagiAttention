@@ -122,11 +122,12 @@ def sanity_check(
 ):
     check_cuda_compute_capability(arch)
     assert direction in ("fwd", "bwd"), "direction must be either fwd or bwd"
-    assert head_dim <= 128, "head_dim must be <= 128 for now"
+    assert head_dim <= 256, "head_dim must be <= 256 for now"
     assert round_up_headdim(head_dim) in (
         64,
         128,
-    ), "round_up_headdim(head_dim) must be 64 or 128 for now"
+        256
+    ), "round_up_headdim(head_dim) must be [64, 128, 256] for now"
     assert compute_dtype in (
         torch.float16,
         torch.bfloat16,

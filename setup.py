@@ -411,12 +411,12 @@ def prebuild_ffa_kernels() -> None:
 
     # determine the combinations of prebuild options
     directions = ["fwd", "bwd"]
-    head_dims = [64, 128]
+    head_dims = [64, 128, 256]
     compute_dtypes = [torch.float16, torch.bfloat16]
     out_dtypes = [torch.float32, torch.float16, torch.bfloat16]
-    softcaps = [False, True]
+    softcaps = [False]
     disable_atomic_opts = [False, True]
-    deterministics = [False, True]
+    deterministics = [False]
     profile_mode = [False]
 
     combos = itertools.product(
